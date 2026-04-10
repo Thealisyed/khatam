@@ -516,47 +516,6 @@
       color: var(--text-faint); font-size: 0.8rem;
     }
 
-    /* ─── Form ────────────────────────────────────── */
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.65rem; margin-bottom: 0.85rem;
-    }
-    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
-    .form-group label {
-      font-size: 0.66rem; font-weight: 500;
-      color: var(--text-faint);
-      text-transform: uppercase; letter-spacing: 0.06em;
-    }
-
-    .form-group select,
-    .form-group input {
-      padding: 0.65rem 0.75rem;
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      font-family: var(--font-body);
-      color: var(--text);
-      background: var(--surface);
-      outline: none;
-      transition: border-color 0.25s, box-shadow 0.25s;
-      width: 100%;
-      appearance: none; -webkit-appearance: none;
-    }
-    .form-group select {
-      background-color: var(--surface);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2364607A' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      padding-right: 2rem;
-    }
-    .form-group select:focus,
-    .form-group input:focus {
-      border-color: var(--teal);
-      box-shadow: 0 0 0 3px var(--teal-glow);
-    }
-    .form-group input::placeholder { color: var(--text-faint); }
-
     .btn {
       width: 100%; padding: 0.75rem;
       border: none; border-radius: var(--radius-sm);
@@ -727,6 +686,183 @@
     .completed .ring-fill { filter: url(#ringGlow) drop-shadow(0 0 8px rgba(176,136,48,0.4)); }
     .completed .ring-percent { color: var(--gold); animation: celebratePulse 2.5s ease-in-out infinite; }
 
+    /* ─── Picker ──────────────────────────────────── */
+    .picker-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      margin-bottom: 0.85rem;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.2s;
+      background: var(--surface-hover);
+    }
+    .picker-trigger:hover {
+      border-color: rgba(0,0,0,0.12);
+      background: #F8F5F0;
+    }
+    .picker-trigger:active { transform: scale(0.99); }
+
+    .picker-trigger-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.08rem;
+    }
+    .picker-trigger-label {
+      font-size: 0.64rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-faint);
+    }
+    .picker-trigger-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .picker-trigger-arrow {
+      font-size: 0.7rem;
+      color: var(--text-faint);
+      transition: transform 0.2s;
+    }
+
+    /* Bottom sheet overlay */
+    .picker-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 600;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .picker-overlay.show { opacity: 1; pointer-events: auto; }
+
+    .picker-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      background: var(--surface);
+      border-radius: 18px 18px 0 0;
+      padding: 0 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.1);
+      max-height: 80vh;
+    }
+    .picker-overlay.show .picker-sheet { transform: translateY(0); }
+
+    .picker-handle {
+      width: 36px; height: 4px;
+      background: #D1CFC8;
+      border-radius: 999px;
+      margin: 0.65rem auto 0;
+    }
+
+    .picker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+    }
+    .picker-header-btn {
+      background: none; border: none;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.3rem 0.1rem;
+      transition: opacity 0.2s;
+    }
+    .picker-header-btn:active { opacity: 0.6; }
+    .picker-cancel { color: var(--text-dim); }
+    .picker-done { color: var(--teal); }
+
+    .picker-header-title {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+    }
+
+    .picker-labels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    .picker-label {
+      font-size: 0.64rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-faint);
+      text-align: center;
+    }
+
+    .picker-wheels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .wheel-container {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(to bottom,
+        transparent 0%, rgba(0,0,0,0.3) 15%, black 35%,
+        black 65%, rgba(0,0,0,0.3) 85%, transparent 100%);
+      mask-image: linear-gradient(to bottom,
+        transparent 0%, rgba(0,0,0,0.3) 15%, black 35%,
+        black 65%, rgba(0,0,0,0.3) 85%, transparent 100%);
+    }
+
+    .wheel-track {
+      position: absolute;
+      width: 100%;
+      left: 0;
+      will-change: transform;
+    }
+
+    .wheel-item {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: grab;
+      white-space: nowrap;
+      transform-origin: center center;
+      backface-visibility: hidden;
+      will-change: transform, opacity;
+    }
+
+    .wheel-selection-band {
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 40px;
+      border-top: 1.5px solid var(--gold);
+      border-bottom: 1.5px solid var(--gold);
+      background: var(--gold-glow);
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
     /* ─── Responsive ──────────────────────────────── */
     @media (max-width: 480px) {
       .app { padding: 1.5rem 1rem 3rem; }
@@ -851,15 +987,12 @@
     <!-- Update -->
     <div class="section" data-animate style="--delay: 0.4s">
       <div class="section-title" style="margin-bottom: 1rem">Update Progress</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="surahSelect">Surah</label>
-          <select id="surahSelect"></select>
+      <div class="picker-trigger" id="pickerTrigger">
+        <div class="picker-trigger-left">
+          <span class="picker-trigger-label">Current Position</span>
+          <span class="picker-trigger-value" id="pickerTriggerValue">1. Al-Fatihah — Ayah 1</span>
         </div>
-        <div class="form-group">
-          <label for="ayahInput">Ayah</label>
-          <input type="number" id="ayahInput" min="1" placeholder="e.g. 45">
-        </div>
+        <span class="picker-trigger-arrow">&#9662;</span>
       </div>
       <button class="btn btn-primary" id="saveBtn">Save Progress</button>
     </div>
@@ -879,6 +1012,32 @@
     <div class="reset-actions" data-animate style="--delay: 0.55s">
       <button class="btn-ghost plan-clear" id="resetPlanBtn">Reset Plan</button>
       <button class="btn-ghost" id="resetAllBtn">Reset All Progress</button>
+    </div>
+  </div>
+
+  <!-- Picker -->
+  <div class="picker-overlay" id="pickerOverlay">
+    <div class="picker-sheet">
+      <div class="picker-handle"></div>
+      <div class="picker-header">
+        <button class="picker-header-btn picker-cancel" id="pickerCancel">Cancel</button>
+        <span class="picker-header-title">Select Position</span>
+        <button class="picker-header-btn picker-done" id="pickerDone">Done</button>
+      </div>
+      <div class="picker-labels">
+        <span class="picker-label">Surah</span>
+        <span class="picker-label">Ayah</span>
+      </div>
+      <div class="picker-wheels">
+        <div class="wheel-container">
+          <div class="wheel-selection-band"></div>
+          <div class="wheel-track" id="surahWheel"></div>
+        </div>
+        <div class="wheel-container">
+          <div class="wheel-selection-band"></div>
+          <div class="wheel-track" id="ayahWheel"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1106,31 +1265,257 @@
       });
     }
 
-    // ─── Dropdown ─────────────────────────────────────────────
-    const surahSelect = document.getElementById('surahSelect');
-    const ayahInput = document.getElementById('ayahInput');
+    // ─── Picker ───────────────────────────────────────────────
     const saveBtn = document.getElementById('saveBtn');
+    let pickerSurah = 1, pickerAyah = 1;
+    let tempSurah = 1, tempAyah = 1;
 
-    SURAHS.forEach(([num, name, total]) => {
-      const opt = document.createElement('option');
-      opt.value = num;
-      opt.textContent = `${num}. ${name} (${total})`;
-      surahSelect.appendChild(opt);
-    });
+    class WheelPicker {
+      constructor(el, items, onChange) {
+        this.el = el;
+        this.items = items;
+        this.onChange = onChange;
+        this.itemH = 40;
+        this.selected = 0;
+        this.offset = 0;
+        this.velocity = 0;
+        this.dragging = false;
+        this.lastY = 0;
+        this.lastTime = 0;
+        this.raf = null;
+        this.containerH = 200;
+        this.centerY = this.containerH / 2 - this.itemH / 2;
 
-    surahSelect.addEventListener('change', () => {
-      const s = SURAHS[surahSelect.value - 1];
-      ayahInput.max = s[2];
-      ayahInput.placeholder = `1\u2013${s[2]}`;
-      ayahInput.value = '';
-    });
+        this._buildItems();
+        this._bindEvents();
+        this.snapTo(0, false);
+      }
 
-    ayahInput.max = 7;
-    ayahInput.placeholder = '1\u20137';
+      _buildItems() {
+        this.el.innerHTML = this.items.map((label, i) =>
+          `<div class="wheel-item" data-idx="${i}">${label}</div>`
+        ).join('');
+      }
 
-    // Enter to submit
-    ayahInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); }
+      _bindEvents() {
+        const container = this.el.parentElement;
+
+        // Touch
+        container.addEventListener('touchstart', e => this._onStart(e.touches[0].clientY, e), { passive: false });
+        container.addEventListener('touchmove', e => this._onMove(e.touches[0].clientY, e), { passive: false });
+        container.addEventListener('touchend', e => this._onEnd(e));
+
+        // Mouse
+        container.addEventListener('mousedown', e => { e.preventDefault(); this._onStart(e.clientY, e); });
+        window.addEventListener('mousemove', e => { if (this.dragging) this._onMove(e.clientY, e); });
+        window.addEventListener('mouseup', e => { if (this.dragging) this._onEnd(e); });
+
+        // Scroll wheel
+        container.addEventListener('wheel', e => {
+          e.preventDefault();
+          const dir = Math.sign(e.deltaY);
+          const next = Math.max(0, Math.min(this.selected + dir, this.items.length - 1));
+          if (next !== this.selected) this.snapTo(next, true);
+        }, { passive: false });
+
+        // Click on item
+        container.addEventListener('click', e => {
+          const item = e.target.closest('.wheel-item');
+          if (item && !this._wasDrag) {
+            const idx = parseInt(item.dataset.idx);
+            this.snapTo(idx, true);
+          }
+        });
+      }
+
+      _onStart(y) {
+        this.dragging = true;
+        this._wasDrag = false;
+        this.lastY = y;
+        this.lastTime = performance.now();
+        this.velocity = 0;
+        if (this.raf) cancelAnimationFrame(this.raf);
+      }
+
+      _onMove(y, e) {
+        if (!this.dragging) return;
+        e.preventDefault();
+        const dy = y - this.lastY;
+        const now = performance.now();
+        const dt = now - this.lastTime;
+
+        if (Math.abs(dy) > 2) this._wasDrag = true;
+
+        this.offset += dy;
+        this.velocity = dt > 0 ? dy / dt : 0;
+        this.lastY = y;
+        this.lastTime = now;
+        this._applyTransform();
+      }
+
+      _onEnd() {
+        this.dragging = false;
+        if (Math.abs(this.velocity) > 0.15) {
+          this._momentum();
+        } else {
+          this._snapNearest();
+        }
+      }
+
+      _momentum() {
+        const friction = 0.95;
+        const step = () => {
+          this.velocity *= friction;
+          this.offset += this.velocity * 16;
+
+          if (Math.abs(this.velocity) < 0.05) {
+            this._snapNearest();
+            return;
+          }
+
+          // Clamp
+          const maxOffset = this.centerY;
+          const minOffset = this.centerY - (this.items.length - 1) * this.itemH;
+          if (this.offset > maxOffset || this.offset < minOffset) {
+            this.offset = Math.max(minOffset, Math.min(maxOffset, this.offset));
+            this._snapNearest();
+            return;
+          }
+
+          this._applyTransform();
+          this.raf = requestAnimationFrame(step);
+        };
+        this.raf = requestAnimationFrame(step);
+      }
+
+      _snapNearest() {
+        const idx = Math.round((this.centerY - this.offset) / this.itemH);
+        const clamped = Math.max(0, Math.min(this.items.length - 1, idx));
+        this.snapTo(clamped, true);
+      }
+
+      snapTo(idx, animate) {
+        this.selected = idx;
+        const targetOffset = this.centerY - idx * this.itemH;
+
+        if (!animate) {
+          this.offset = targetOffset;
+          this._applyTransform();
+          this.onChange(idx);
+          return;
+        }
+
+        const startOffset = this.offset;
+        const dist = targetOffset - startOffset;
+        const startTime = performance.now();
+        const duration = 350;
+
+        const ease = t => 1 - Math.pow(1 - t, 4); // easeOutQuart
+
+        const tick = now => {
+          const p = Math.min((now - startTime) / duration, 1);
+          this.offset = startOffset + dist * ease(p);
+          this._applyTransform();
+          if (p < 1) {
+            this.raf = requestAnimationFrame(tick);
+          } else {
+            this.onChange(idx);
+          }
+        };
+        this.raf = requestAnimationFrame(tick);
+      }
+
+      _applyTransform() {
+        this.el.style.transform = `translateY(${this.offset}px)`;
+        const children = this.el.children;
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          const itemCenter = i * this.itemH + this.itemH / 2 + this.offset;
+          const center = this.containerH / 2;
+          const dist = (itemCenter - center) / this.containerH;
+          const angle = dist * 55; // barrel rotation degrees
+          const absD = Math.abs(dist);
+          const opacity = Math.max(0.2, 1 - absD * 1.2);
+          const scale = Math.max(0.8, 1 - absD * 0.25);
+          child.style.transform = `perspective(350px) rotateX(${-angle}deg) scale(${scale})`;
+          child.style.opacity = opacity;
+        }
+      }
+
+      updateItems(newItems) {
+        this.items = newItems;
+        this._buildItems();
+        const newIdx = Math.min(this.selected, newItems.length - 1);
+        this.snapTo(newIdx, false);
+      }
+
+      getValue() { return this.selected; }
+    }
+
+    // Picker state and init
+    const pickerOverlay = document.getElementById('pickerOverlay');
+    const pickerTrigger = document.getElementById('pickerTrigger');
+    const pickerTriggerValue = document.getElementById('pickerTriggerValue');
+
+    const surahLabels = SURAHS.map(([num, name]) => `${num}. ${name}`);
+    let ayahLabels = Array.from({ length: SURAHS[0][2] }, (_, i) => `Ayah ${i + 1}`);
+
+    let surahWheel, ayahWheel;
+
+    function initPicker() {
+      surahWheel = new WheelPicker(
+        document.getElementById('surahWheel'),
+        surahLabels,
+        idx => {
+          tempSurah = idx + 1;
+          const count = SURAHS[idx][2];
+          ayahLabels = Array.from({ length: count }, (_, i) => `Ayah ${i + 1}`);
+          ayahWheel.updateItems(ayahLabels);
+          tempAyah = ayahWheel.getValue() + 1;
+        }
+      );
+
+      ayahWheel = new WheelPicker(
+        document.getElementById('ayahWheel'),
+        ayahLabels,
+        idx => { tempAyah = idx + 1; }
+      );
+    }
+
+    function updateTriggerDisplay() {
+      const s = SURAHS[pickerSurah - 1];
+      pickerTriggerValue.textContent = `${pickerSurah}. ${s[1]} — Ayah ${pickerAyah}`;
+    }
+
+    function openPicker() {
+      tempSurah = pickerSurah;
+      tempAyah = pickerAyah;
+
+      // Update ayah wheel for current surah
+      const count = SURAHS[pickerSurah - 1][2];
+      ayahLabels = Array.from({ length: count }, (_, i) => `Ayah ${i + 1}`);
+      ayahWheel.updateItems(ayahLabels);
+
+      surahWheel.snapTo(pickerSurah - 1, false);
+      ayahWheel.snapTo(pickerAyah - 1, false);
+
+      pickerOverlay.classList.add('show');
+    }
+
+    function closePicker(accept) {
+      pickerOverlay.classList.remove('show');
+      if (accept) {
+        pickerSurah = tempSurah;
+        pickerAyah = tempAyah;
+        updateTriggerDisplay();
+      }
+    }
+
+    pickerTrigger.addEventListener('click', openPicker);
+    document.getElementById('pickerCancel').addEventListener('click', () => closePicker(false));
+    document.getElementById('pickerDone').addEventListener('click', () => closePicker(true));
+    pickerOverlay.addEventListener('click', e => {
+      if (e.target === pickerOverlay) closePicker(false);
     });
 
     // ─── Surah Map ────────────────────────────────────────────
@@ -1423,11 +1808,11 @@
     });
 
     saveBtn.addEventListener('click', () => {
-      const surahNum = parseInt(surahSelect.value);
-      const ayah = parseInt(ayahInput.value);
+      const surahNum = pickerSurah;
+      const ayah = pickerAyah;
       const surah = SURAHS[surahNum - 1];
 
-      if (!ayah || ayah < 1 || ayah > surah[2]) {
+      if (ayah < 1 || ayah > surah[2]) {
         showToast(`Please enter an ayah between 1 and ${surah[2]}`);
         return;
       }
@@ -1465,14 +1850,12 @@
 
       showToast(`Progress saved \u2014 ${surah[1]} : ${ayah}`);
 
-      // Auto-advance form
+      // Auto-advance picker
       if (ayah >= surah[2] && surahNum < 114) {
-        surahSelect.value = surahNum + 1;
-        const next = SURAHS[surahNum];
-        ayahInput.max = next[2];
-        ayahInput.placeholder = `1\u2013${next[2]}`;
+        pickerSurah = surahNum + 1;
+        pickerAyah = 1;
       }
-      ayahInput.value = '';
+      updateTriggerDisplay();
     }
 
     document.getElementById('resetPlanBtn').addEventListener('click', async () => {
@@ -1490,12 +1873,33 @@
       const ok = await showModal('Reset all progress and plan? This cannot be undone.', 'Reset Everything', true);
       if (!ok) return;
       localStorage.removeItem('khatam');
+      pickerSurah = 1; pickerAyah = 1;
+      updateTriggerDisplay();
       render(false);
       showToast('All progress has been reset');
     });
 
     // ─── Init ─────────────────────────────────────────────────
     renderDates();
+    initPicker();
+
+    // Restore picker to current position from saved data
+    (function() {
+      const data = loadData();
+      if (data.history && data.history.length > 0) {
+        const latest = data.history[0];
+        pickerSurah = latest.surah;
+        pickerAyah = latest.ayah;
+        // Auto-advance if surah was completed
+        const s = SURAHS[latest.surah - 1];
+        if (latest.ayah >= s[2] && latest.surah < 114) {
+          pickerSurah = latest.surah + 1;
+          pickerAyah = 1;
+        }
+        updateTriggerDisplay();
+      }
+    })();
+
     render(true);
   </script>
 </body>
