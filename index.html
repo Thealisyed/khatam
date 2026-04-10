@@ -3,30 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#F5F1EB">
+  <meta name="description" content="Track your Quran reading progress with daily plans, Juz tracking, and estimated completion dates">
   <title>Khatam — Quran Reading Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230F6B58'/%3E%3Cpath d='M8 8v16c4-2 8-1 8 0V10c0-1-4-2-8 0zm16 0v16c-4-2-8-1-8 0V10c0-1 4-2 8 0z' fill='white' opacity='.9'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #F5F1EB;
       --surface: #FFFFFF;
-      --surface-hover: #F9F7F4;
+      --surface-hover: #FAF8F5;
       --surface-border: rgba(0,0,0,0.07);
-      --text: #1A1A2E;
-      --text-dim: #6B6878;
+      --text: #1C1C28;
+      --text-dim: #64607A;
       --text-faint: #A09DAD;
-      --gold: #B8943D;
-      --gold-glow: rgba(184,148,61,0.12);
-      --gold-bright: #D4AA4A;
-      --teal: #1B7A64;
-      --teal-glow: rgba(27,122,100,0.1);
+      --gold: #B08830;
+      --gold-glow: rgba(176,136,48,0.12);
+      --gold-bright: #CCA04A;
+      --teal: #0F6B58;
+      --teal-glow: rgba(15,107,88,0.1);
       --danger: #C44040;
-      --danger-glow: rgba(196,64,64,0.1);
+      --danger-glow: rgba(196,64,64,0.08);
       --radius: 14px;
       --radius-sm: 8px;
       --shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
-      --font-body: 'Manrope', sans-serif;
+      --font-body: 'Outfit', sans-serif;
       --font-display: 'Cormorant Garamond', serif;
       --font-arabic: 'Amiri', serif;
     }
@@ -40,18 +43,17 @@
       min-height: 100vh;
       line-height: 1.6;
       background-image:
-        radial-gradient(ellipse at 50% 0%, rgba(184,148,61,0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(27,122,100,0.04) 0%, transparent 50%);
+        radial-gradient(ellipse at 50% 0%, rgba(176,136,48,0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(15,107,88,0.04) 0%, transparent 50%);
     }
 
-    /* Grain overlay */
     body::after {
       content: '';
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 100;
-      opacity: 0.35;
+      opacity: 0.3;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     }
 
@@ -63,19 +65,26 @@
       z-index: 1;
     }
 
-    /* Entrance animations */
+    /* ─── Animations ──────────────────────────────── */
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(24px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-
-    @keyframes ringReveal {
-      from { stroke-dashoffset: 534; }
+    @keyframes gentlePulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--gold-glow); }
+      50% { opacity: 0.75; box-shadow: 0 0 6px 2px var(--gold-glow); }
+    }
+    @keyframes celebratePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     [data-animate] {
@@ -84,11 +93,8 @@
       animation-delay: var(--delay, 0s);
     }
 
-    /* Header */
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
+    /* ─── Header ──────────────────────────────────── */
+    header { text-align: center; margin-bottom: 1.75rem; }
 
     .bismillah {
       font-family: var(--font-arabic);
@@ -122,50 +128,37 @@
       align-items: center;
       justify-content: center;
       gap: 0.75rem;
-      margin-top: 1rem;
-      font-size: 0.78rem;
+      margin-top: 0.85rem;
+      font-size: 0.76rem;
       color: var(--text-dim);
     }
 
     .date-display .sep {
-      width: 3px;
-      height: 3px;
+      width: 3px; height: 3px;
       background: var(--gold);
       border-radius: 50%;
       opacity: 0.5;
     }
 
-    .date-islamic {
-      color: var(--gold);
-      opacity: 0.8;
-    }
+    .date-islamic { color: var(--gold); opacity: 0.85; }
 
-    /* Ornamental divider */
+    /* ─── Ornament ────────────────────────────────── */
     .ornament {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.75rem;
-      padding: 1rem 0;
+      padding: 0.75rem 0;
       margin: 0 3rem;
     }
-
     .ornament::before, .ornament::after {
-      content: '';
-      flex: 1;
-      max-width: 60px;
-      height: 1px;
+      content: ''; flex: 1; max-width: 60px; height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
       opacity: 0.2;
     }
+    .ornament span { color: var(--gold); opacity: 0.2; font-size: 0.6rem; }
 
-    .ornament span {
-      color: var(--gold);
-      opacity: 0.2;
-      font-size: 0.6rem;
-    }
-
-    /* Section */
+    /* ─── Section ─────────────────────────────────── */
     .section {
       background: var(--surface);
       border: 1px solid var(--surface-border);
@@ -173,6 +166,11 @@
       padding: 1.5rem;
       margin-bottom: 0.75rem;
       box-shadow: var(--shadow);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .section:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.07);
     }
 
     .section-title {
@@ -182,110 +180,187 @@
       text-transform: uppercase;
       letter-spacing: 0.14em;
       color: var(--text-dim);
-      margin-bottom: 1.25rem;
     }
 
-    /* Progress Ring */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .section-count {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    /* ─── Progress Ring ───────────────────────────── */
     .progress-section {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 1.5rem 1.5rem 1rem;
+      padding: 1.5rem 1.5rem 1.25rem;
     }
+    .progress-section:hover { transform: none; }
 
     .ring-container {
       position: relative;
-      width: 190px;
-      height: 190px;
+      width: 195px; height: 195px;
       margin-bottom: 1.25rem;
     }
 
     .progress-ring {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       transform: rotate(-90deg);
     }
 
-    .ring-bg {
-      fill: none;
-      stroke: #E8E4DD;
-      stroke-width: 5;
-    }
-
+    .ring-deco { fill: none; stroke: var(--surface-border); stroke-width: 0.5; }
+    .ring-bg { fill: none; stroke: #E8E4DD; stroke-width: 6; }
     .ring-fill {
       fill: none;
-      stroke: url(#goldGrad);
-      stroke-width: 5;
+      stroke: url(#ringGrad);
+      stroke-width: 6;
       stroke-linecap: round;
       stroke-dasharray: 534;
       stroke-dashoffset: 534;
       transition: stroke-dashoffset 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: url(#ringGlow);
     }
 
     .ring-center {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
     }
 
     .ring-percent {
       font-family: var(--font-display);
-      font-size: 3rem;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1;
+      font-size: 3rem; font-weight: 700;
+      color: var(--text); line-height: 1;
     }
 
     .ring-label {
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: var(--text-dim);
+      font-size: 0.68rem; font-weight: 500;
+      color: var(--text-faint);
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      margin-top: 0.2rem;
+      margin-top: 0.15rem;
     }
 
-    .progress-info {
-      text-align: center;
-    }
+    .progress-info { text-align: center; }
 
     .ayat-count {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      margin-bottom: 0.35rem;
+      font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.3rem;
     }
-
-    .ayat-count strong {
-      color: var(--text);
-      font-weight: 600;
-    }
+    .ayat-count strong { color: var(--text); font-weight: 600; }
 
     .current-reading {
       font-family: var(--font-display);
-      font-size: 1.3rem;
-      font-weight: 600;
+      font-size: 1.3rem; font-weight: 600;
       color: var(--gold);
+      margin-bottom: 0.5rem;
     }
 
-    /* Stats Grid */
+    .progress-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .meta-sep { opacity: 0.3; }
+
+    .juz-badge {
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    .streak-badge { font-weight: 500; }
+    .streak-badge.active { color: var(--gold); font-weight: 600; }
+
+    /* ─── Surah Map ───────────────────────────────── */
+    .surah-map {
+      display: grid;
+      grid-template-columns: repeat(19, 1fr);
+      gap: 2px;
+    }
+
+    .surah-tile {
+      aspect-ratio: 1;
+      border-radius: 3px;
+      background: #E6E3DC;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .surah-tile:hover {
+      transform: scale(1.4);
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .surah-tile.completed { background: var(--teal); }
+    .surah-tile.current {
+      background: var(--gold);
+      animation: gentlePulse 2.5s ease-in-out infinite;
+    }
+
+    .map-legend {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem;
+      margin-top: 0.75rem;
+      font-size: 0.66rem;
+      color: var(--text-dim);
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.35rem; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+    .legend-dot.completed { background: var(--teal); }
+    .legend-dot.current { background: var(--gold); }
+    .legend-dot.unread { background: #E6E3DC; }
+
+    /* Tooltip */
+    .tooltip {
+      position: fixed;
+      transform: translateX(-50%) translateY(-100%);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.25rem 0.6rem;
+      border-radius: 5px;
+      font-size: 0.68rem;
+      font-weight: 500;
+      pointer-events: none;
+      z-index: 200;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.12s;
+    }
+    .tooltip.show { opacity: 1; }
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: var(--text);
+    }
+
+    /* ─── Stats Grid ──────────────────────────────── */
     .stats-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.65rem;
     }
 
     .stat-card {
       background: var(--surface-hover);
       border: 1px solid var(--surface-border);
       border-radius: 10px;
-      padding: 1rem;
+      padding: 0.85rem 0.5rem;
       text-align: center;
-      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
-
     .stat-card:hover {
       border-color: rgba(0,0,0,0.1);
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
@@ -293,31 +368,46 @@
 
     .stat-value {
       font-family: var(--font-display);
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
+      font-size: 1.35rem; font-weight: 700;
+      color: var(--text); line-height: 1.2;
     }
-
     .stat-value.gold { color: var(--gold); }
     .stat-value.teal { color: var(--teal); }
 
     .stat-label {
-      font-size: 0.65rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-faint);
-      margin-top: 0.3rem;
+      font-size: 0.62rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-faint); margin-top: 0.25rem;
     }
 
-    .stat-sub {
-      font-size: 0.7rem;
+    /* Completion Callout */
+    .completion-callout {
+      margin-top: 0.65rem;
+      padding: 0.85rem 1rem;
+      background: var(--gold-glow);
+      border: 1px solid rgba(176,136,48,0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .completion-details { display: flex; flex-direction: column; gap: 0.1rem; }
+
+    .completion-date {
+      font-weight: 600; font-size: 0.88rem; color: var(--text);
+    }
+    .completion-islamic {
+      font-size: 0.72rem; color: var(--gold); font-weight: 500;
+    }
+    .completion-remaining {
+      font-size: 0.7rem; font-weight: 600;
       color: var(--text-dim);
-      margin-top: 0.15rem;
+      white-space: nowrap;
     }
 
-    /* Plan Section */
+    /* ─── Plan ────────────────────────────────────── */
     .plan-options {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -326,178 +416,117 @@
     }
 
     .plan-btn {
-      padding: 0.65rem 0.25rem;
+      padding: 0.6rem 0.25rem;
       border: 1px solid var(--surface-border);
       border-radius: var(--radius-sm);
       background: transparent;
       color: var(--text-dim);
       font-family: var(--font-body);
-      font-size: 0.78rem;
-      font-weight: 500;
+      font-size: 0.76rem; font-weight: 500;
       cursor: pointer;
       transition: all 0.25s;
       text-align: center;
     }
-
     .plan-btn:hover {
-      border-color: var(--gold);
-      color: var(--gold);
+      border-color: var(--gold); color: var(--gold);
       background: var(--gold-glow);
     }
-
     .plan-btn.active {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: var(--gold-glow);
-      font-weight: 600;
+      border-color: var(--gold); color: var(--gold);
+      background: var(--gold-glow); font-weight: 600;
     }
-
-    .plan-btn:active {
-      transform: scale(0.96);
-    }
+    .plan-btn:active { transform: scale(0.96); }
 
     .plan-summary {
       background: var(--gold-glow);
-      border: 1px solid rgba(201,168,76,0.2);
+      border: 1px solid rgba(176,136,48,0.18);
       border-radius: 10px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
-    .plan-summary-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.1rem;
-    }
-
-    .plan-summary-title {
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: var(--gold);
-    }
-
-    .plan-summary-detail {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
+    .plan-summary-info { display: flex; flex-direction: column; gap: 0.08rem; }
+    .plan-summary-title { font-weight: 600; font-size: 0.82rem; color: var(--gold); }
+    .plan-summary-detail { font-size: 0.72rem; color: var(--text-dim); }
 
     .plan-status {
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 0.3rem 0.7rem;
+      font-size: 0.68rem; font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px; white-space: nowrap;
+    }
+    .plan-status.on-track { background: var(--teal-glow); color: var(--teal); }
+    .plan-status.behind { background: var(--danger-glow); color: var(--danger); }
+    .plan-status.expired { background: rgba(160,157,173,0.12); color: var(--text-faint); }
+
+    .plan-progress-track {
+      width: 100%; height: 3px;
+      background: #E8E4DD;
       border-radius: 999px;
-      white-space: nowrap;
+      margin-bottom: 0.65rem;
+      overflow: hidden;
     }
-
-    .plan-status.on-track {
-      background: var(--teal-glow);
-      color: var(--teal);
-    }
-
-    .plan-status.behind {
-      background: var(--danger-glow);
-      color: var(--danger);
+    .plan-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+      border-radius: 999px;
+      transition: width 0.6s ease;
     }
 
     .plan-days {
       list-style: none;
-      max-height: 280px;
+      max-height: 260px;
       overflow-y: auto;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
-
     .plan-days::-webkit-scrollbar { width: 3px; }
-    .plan-days::-webkit-scrollbar-thumb {
-      background: var(--text-faint);
-      border-radius: 999px;
-    }
+    .plan-days::-webkit-scrollbar-thumb { background: var(--text-faint); border-radius: 999px; }
 
     .plan-day {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.7rem 0.75rem;
+      padding: 0.6rem 0.7rem;
       border-radius: var(--radius-sm);
-      margin-bottom: 2px;
+      margin-bottom: 1px;
       transition: background 0.2s;
     }
-
-    .plan-day:hover {
-      background: rgba(0,0,0,0.02);
-    }
-
+    .plan-day:hover { background: rgba(0,0,0,0.02); }
     .plan-day.today {
       background: var(--gold-glow);
-      border: 1px solid rgba(201,168,76,0.15);
+      border: 1px solid rgba(176,136,48,0.12);
     }
+    .plan-day.past { opacity: 0.4; }
 
-    .plan-day.past {
-      opacity: 0.45;
-    }
-
-    .plan-day-left {
-      display: flex;
-      flex-direction: column;
-      gap: 0.1rem;
-    }
-
-    .plan-day-num {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
+    .plan-day-left { display: flex; flex-direction: column; gap: 0.06rem; }
+    .plan-day-num { font-size: 0.78rem; font-weight: 600; color: var(--text); }
     .plan-day-num .tag {
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: var(--gold);
-      margin-left: 0.35rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: 0.62rem; font-weight: 600; color: var(--gold);
+      margin-left: 0.3rem; text-transform: uppercase; letter-spacing: 0.04em;
     }
+    .plan-day-date { font-size: 0.68rem; color: var(--text-faint); }
 
-    .plan-day-date {
-      font-size: 0.7rem;
-      color: var(--text-faint);
-    }
-
-    .plan-day-target {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--text-dim);
-      text-align: right;
-    }
+    .plan-day-right { display: flex; align-items: center; gap: 0.4rem; }
+    .plan-day-target { font-size: 0.75rem; font-weight: 500; color: var(--text-dim); }
+    .day-check { color: var(--teal); font-weight: 700; font-size: 0.85rem; }
 
     .plan-empty {
-      text-align: center;
-      padding: 1.5rem 1rem;
-      color: var(--text-faint);
-      font-size: 0.82rem;
+      text-align: center; padding: 1.25rem 1rem;
+      color: var(--text-faint); font-size: 0.8rem;
     }
 
-    /* Update Form */
+    /* ─── Form ────────────────────────────────────── */
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.65rem;
-      margin-bottom: 0.85rem;
+      gap: 0.65rem; margin-bottom: 0.85rem;
     }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
     .form-group label {
-      font-size: 0.68rem;
-      font-weight: 500;
+      font-size: 0.66rem; font-weight: 500;
       color: var(--text-faint);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      text-transform: uppercase; letter-spacing: 0.06em;
     }
 
     .form-group select,
@@ -512,197 +541,205 @@
       outline: none;
       transition: border-color 0.25s, box-shadow 0.25s;
       width: 100%;
-      appearance: none;
-      -webkit-appearance: none;
+      appearance: none; -webkit-appearance: none;
     }
-
     .form-group select {
       background-color: var(--surface);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236B6878' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2364607A' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 0.75rem center;
       padding-right: 2rem;
     }
-
     .form-group select:focus,
     .form-group input:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px var(--gold-glow);
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-glow);
     }
-
-    .form-group input::placeholder {
-      color: var(--text-faint);
-    }
+    .form-group input::placeholder { color: var(--text-faint); }
 
     .btn {
-      width: 100%;
-      padding: 0.75rem;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      font-weight: 600;
+      width: 100%; padding: 0.75rem;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 0.85rem; font-weight: 600;
       font-family: var(--font-body);
       cursor: pointer;
       transition: all 0.25s;
       letter-spacing: 0.02em;
+      position: relative;
+      overflow: hidden;
     }
-
     .btn-primary {
-      background: linear-gradient(135deg, var(--teal), #22906F);
+      background: linear-gradient(135deg, var(--teal), #12856C);
       color: #FFFFFF;
     }
-
     .btn-primary:hover {
       box-shadow: 0 4px 20px var(--teal-glow);
       transform: translateY(-1px);
     }
-
-    .btn-primary:active {
-      transform: translateY(0) scale(0.98);
+    .btn-primary:active { transform: translateY(0) scale(0.98); }
+    .btn-primary.success {
+      background: linear-gradient(135deg, #1A9E7E, #22B88E);
     }
 
-    /* History */
+    /* ─── History ─────────────────────────────────── */
     .history-list {
       list-style: none;
       max-height: 220px;
       overflow-y: auto;
     }
-
     .history-list::-webkit-scrollbar { width: 3px; }
-    .history-list::-webkit-scrollbar-thumb {
-      background: var(--text-faint);
-      border-radius: 999px;
-    }
+    .history-list::-webkit-scrollbar-thumb { background: var(--text-faint); border-radius: 999px; }
 
     .history-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.6rem 0;
+      padding: 0.55rem 0;
       border-bottom: 1px solid var(--surface-border);
+      animation: fadeIn 0.3s ease forwards;
     }
-
     .history-item:last-child { border-bottom: none; }
 
-    .history-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .history-surah {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    .history-date {
-      font-size: 0.7rem;
-      color: var(--text-faint);
-    }
-
+    .history-info { display: flex; flex-direction: column; }
+    .history-surah { font-size: 0.84rem; font-weight: 500; color: var(--text); }
+    .history-date { font-size: 0.68rem; color: var(--text-faint); }
     .history-badge {
-      font-size: 0.68rem;
-      font-weight: 600;
-      padding: 0.2rem 0.55rem;
+      font-size: 0.66rem; font-weight: 600;
+      padding: 0.2rem 0.5rem;
       border-radius: 999px;
       background: var(--teal-glow);
       color: var(--teal);
     }
 
     .empty-state {
-      text-align: center;
-      padding: 2rem 1rem;
-      color: var(--text-faint);
-      font-size: 0.82rem;
-      line-height: 1.6;
+      text-align: center; padding: 1.75rem 1rem;
+      color: var(--text-faint); font-size: 0.8rem; line-height: 1.6;
+    }
+    .empty-icon {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.35rem;
+      opacity: 0.5;
     }
 
-    /* Reset actions */
+    /* ─── Reset Actions ───────────────────────────── */
     .reset-actions {
       display: flex;
       justify-content: center;
       gap: 0.5rem;
       margin-top: 1.25rem;
     }
-
     .btn-ghost {
       background: none;
       border: 1px solid var(--surface-border);
       color: var(--text-faint);
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-family: var(--font-body);
-      padding: 0.45rem 1rem;
+      padding: 0.4rem 0.9rem;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.25s;
     }
-
     .btn-ghost:hover {
-      border-color: var(--danger);
-      color: var(--danger);
+      border-color: var(--danger); color: var(--danger);
       background: var(--danger-glow);
     }
-
-    .btn-ghost:active {
-      transform: scale(0.96);
-    }
-
-    .btn-ghost.plan-clear {
-      border-color: var(--gold);
-      color: var(--gold);
-      opacity: 0.6;
-    }
-
+    .btn-ghost:active { transform: scale(0.96); }
     .btn-ghost.plan-clear:hover {
-      opacity: 1;
+      border-color: var(--gold); color: var(--gold);
       background: var(--gold-glow);
     }
 
-    /* Toast */
+    /* ─── Modal ───────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center; justify-content: center;
+      z-index: 500;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+    .modal-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      max-width: 340px; width: 90%;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      transform: scale(0.92);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.show .modal-card { transform: scale(1); }
+
+    .modal-msg {
+      font-size: 0.88rem; color: var(--text);
+      line-height: 1.5; margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .modal-actions { display: flex; gap: 0.6rem; }
+    .modal-btn {
+      flex: 1; padding: 0.65rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; border: none;
+    }
+    .modal-btn.cancel {
+      background: var(--surface-hover); color: var(--text-dim);
+      border: 1px solid var(--surface-border);
+    }
+    .modal-btn.cancel:hover { background: #EEEBE5; }
+    .modal-btn.confirm { background: var(--teal); color: white; }
+    .modal-btn.confirm:hover { background: #0B5C4A; }
+    .modal-btn.confirm.danger { background: var(--danger); }
+    .modal-btn.confirm.danger:hover { background: #B33636; }
+
+    /* ─── Toast ───────────────────────────────────── */
     .toast {
       position: fixed;
-      bottom: 1.5rem;
-      left: 50%;
+      bottom: 1.5rem; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: var(--text);
-      border: none;
+      background: var(--text); color: var(--bg);
       border-left: 3px solid var(--gold);
-      color: #F5F1EB;
-      padding: 0.75rem 1.25rem;
+      padding: 0.7rem 1.15rem;
       border-radius: var(--radius-sm);
-      font-size: 0.82rem;
-      font-weight: 500;
+      font-size: 0.8rem; font-weight: 500;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
       opacity: 0;
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 1000;
-      max-width: 90%;
+      z-index: 1000; max-width: 90%;
+      padding-bottom: calc(0.7rem + env(safe-area-inset-bottom, 0px));
     }
-
     .toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Completion celebration */
-    .completed .ring-fill {
-      filter: drop-shadow(0 0 8px var(--gold));
+    /* ─── Celebration ─────────────────────────────── */
+    .completed {
+      border-color: rgba(176,136,48,0.3) !important;
+      box-shadow: 0 0 24px var(--gold-glow), var(--shadow) !important;
     }
+    .completed .ring-fill { filter: url(#ringGlow) drop-shadow(0 0 8px rgba(176,136,48,0.4)); }
+    .completed .ring-percent { color: var(--gold); animation: celebratePulse 2.5s ease-in-out infinite; }
 
-    .completed .ring-percent {
-      color: var(--gold);
-    }
-
-    /* Responsive */
+    /* ─── Responsive ──────────────────────────────── */
     @media (max-width: 480px) {
       .app { padding: 1.5rem 1rem 3rem; }
       .site-title { font-size: 1.8rem; }
-      .bismillah { font-size: 1.4rem; }
-      .ring-container { width: 160px; height: 160px; }
-      .ring-percent { font-size: 2.4rem; }
-      .stat-value { font-size: 1.2rem; }
+      .bismillah { font-size: 1.35rem; }
+      .ring-container { width: 165px; height: 165px; }
+      .ring-percent { font-size: 2.5rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+      .stat-value { font-size: 1.15rem; }
       .plan-options { grid-template-columns: repeat(2, 1fr); }
       .ornament { margin: 0 1.5rem; }
+      .surah-map { grid-template-columns: repeat(12, 1fr); }
+      .completion-callout { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
     }
   </style>
 </head>
@@ -721,18 +758,26 @@
 
     <div class="ornament" data-animate style="--delay: 0.05s" aria-hidden="true"><span>&#10022;</span></div>
 
-    <!-- Progress Ring -->
-    <div class="section progress-section" id="progressSection" data-animate style="--delay: 0.1s">
+    <!-- Progress -->
+    <div class="section progress-section" id="progressSection" data-animate style="--delay: 0.1s"
+         role="region" aria-label="Reading progress">
       <div class="ring-container">
-        <svg class="progress-ring" viewBox="0 0 200 200">
+        <svg class="progress-ring" viewBox="0 0 200 200" aria-hidden="true">
           <defs>
-            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#E0C06A"/>
-              <stop offset="100%" stop-color="#C9A84C"/>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#CCA04A"/>
+              <stop offset="50%" stop-color="#B08830"/>
+              <stop offset="100%" stop-color="#CCA04A"/>
             </linearGradient>
+            <filter id="ringGlow">
+              <feGaussianBlur stdDeviation="2" result="blur"/>
+              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            </filter>
           </defs>
+          <circle class="ring-deco" cx="100" cy="100" r="91"/>
           <circle class="ring-bg" cx="100" cy="100" r="85"/>
           <circle class="ring-fill" id="ringFill" cx="100" cy="100" r="85"/>
+          <circle class="ring-deco" cx="100" cy="100" r="79"/>
         </svg>
         <div class="ring-center">
           <span class="ring-percent" id="ringPercent">0%</span>
@@ -742,6 +787,25 @@
       <div class="progress-info">
         <div class="ayat-count"><strong id="ayatRead">0</strong> / 6,236 ayat</div>
         <div class="current-reading" id="currentReading">Begin your journey</div>
+        <div class="progress-meta">
+          <span class="juz-badge" id="juzBadge">Juz 0 of 30</span>
+          <span class="meta-sep">|</span>
+          <span class="streak-badge" id="streakBadge">No streak yet</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Surah Map -->
+    <div class="section" data-animate style="--delay: 0.15s">
+      <div class="section-header">
+        <span class="section-title">Surah Progress</span>
+        <span class="section-count" id="surahMapCount">0 / 114</span>
+      </div>
+      <div class="surah-map" id="surahMap"></div>
+      <div class="map-legend">
+        <span class="legend-item"><span class="legend-dot completed"></span>Read</span>
+        <span class="legend-item"><span class="legend-dot current"></span>Current</span>
+        <span class="legend-item"><span class="legend-dot unread"></span>Remaining</span>
       </div>
     </div>
 
@@ -749,28 +813,30 @@
     <div class="section" data-animate style="--delay: 0.2s">
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-value teal" id="surahsDone">0 / 114</div>
+          <div class="stat-value teal" id="surahsDone">0/114</div>
           <div class="stat-label">Surahs</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="avgPace">&mdash;</div>
+          <div class="stat-value" id="juzDone">0/30</div>
+          <div class="stat-label">Juz</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value gold" id="avgPace">&mdash;</div>
           <div class="stat-label">Ayat / Day</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="daysLeft">&mdash;</div>
-          <div class="stat-label">Days Left</div>
+      </div>
+      <div class="completion-callout" id="completionCallout" style="display:none">
+        <div class="completion-details">
+          <span class="completion-date" id="estCompDate">&mdash;</span>
+          <span class="completion-islamic" id="estCompIslamic"></span>
         </div>
-        <div class="stat-card">
-          <div class="stat-value gold" id="estCompletion">&mdash;</div>
-          <div class="stat-label">Est. Completion</div>
-          <div class="stat-sub" id="estCompletionIslamic"></div>
-        </div>
+        <span class="completion-remaining" id="estCompDays"></span>
       </div>
     </div>
 
-    <!-- Reading Plan -->
+    <!-- Plan -->
     <div class="section" data-animate style="--delay: 0.3s">
-      <div class="section-title">Reading Plan</div>
+      <div class="section-title" style="margin-bottom: 1rem">Reading Plan</div>
       <div class="plan-options">
         <button class="plan-btn" data-weeks="1">1 Week</button>
         <button class="plan-btn" data-weeks="2">2 Weeks</button>
@@ -782,9 +848,9 @@
       </div>
     </div>
 
-    <!-- Update Progress -->
+    <!-- Update -->
     <div class="section" data-animate style="--delay: 0.4s">
-      <div class="section-title">Update Progress</div>
+      <div class="section-title" style="margin-bottom: 1rem">Update Progress</div>
       <div class="form-row">
         <div class="form-group">
           <label for="surahSelect">Surah</label>
@@ -800,9 +866,12 @@
 
     <!-- History -->
     <div class="section" data-animate style="--delay: 0.5s">
-      <div class="section-title">Reading History</div>
+      <div class="section-title" style="margin-bottom: 1rem">Reading History</div>
       <ul class="history-list" id="historyList">
-        <li class="empty-state">No entries yet &mdash; start reading and log your progress.</li>
+        <li class="empty-state">
+          <span class="empty-icon">&#9782;</span>
+          No entries yet &mdash; start reading and log your progress.
+        </li>
       </ul>
     </div>
 
@@ -813,10 +882,25 @@
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-card">
+      <p class="modal-msg" id="modalMsg"></p>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="modalCancel">Cancel</button>
+        <button class="modal-btn confirm" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tooltip -->
+  <div class="tooltip" id="tooltip"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
   <script>
-    // ─── Quran Data ──────────────────────────────────────────
+    // ─── Data ─────────────────────────────────────────────────
     const SURAHS = [
       [1,"Al-Fatihah",7],[2,"Al-Baqarah",286],[3,"Aal-E-Imran",200],[4,"An-Nisa",176],
       [5,"Al-Ma'idah",120],[6,"Al-An'am",165],[7,"Al-A'raf",206],[8,"Al-Anfal",75],
@@ -852,120 +936,180 @@
     const TOTAL_AYAT = 6236;
 
     const CUMULATIVE = [0];
-    for (let i = 0; i < SURAHS.length; i++) {
-      CUMULATIVE.push(CUMULATIVE[i] + SURAHS[i][2]);
-    }
+    for (let i = 0; i < SURAHS.length; i++) CUMULATIVE.push(CUMULATIVE[i] + SURAHS[i][2]);
 
-    // ─── Helpers ─────────────────────────────────────────────
+    // Juz boundaries: [surah_number, ayah_number]
+    const JUZ_STARTS = [
+      [1,1],[2,142],[2,253],[3,93],[4,24],[4,148],[5,83],[6,111],
+      [7,88],[8,41],[9,93],[11,6],[12,53],[15,1],[17,1],[18,75],
+      [21,1],[23,1],[25,21],[27,56],[29,46],[33,31],[36,28],[39,32],
+      [41,47],[46,1],[51,31],[58,1],[67,1],[78,1]
+    ];
+
+    // ─── Helpers ──────────────────────────────────────────────
     function loadData() {
       return JSON.parse(localStorage.getItem('khatam') || '{"history":[],"plan":null}');
     }
 
     function saveDataStore(data) {
-      localStorage.setItem('khatam', JSON.stringify(data));
+      try { localStorage.setItem('khatam', JSON.stringify(data)); }
+      catch (e) { showToast('Storage full \u2014 consider clearing old history'); }
     }
 
-    function getAyatRead(surahNum, ayah) {
-      return CUMULATIVE[surahNum - 1] + ayah;
-    }
+    function getAyatRead(s, a) { return CUMULATIVE[s - 1] + a; }
 
-    function cumulativeToPosition(cumAyat) {
-      cumAyat = Math.min(Math.max(cumAyat, 1), TOTAL_AYAT);
+    function cumulativeToPosition(cum) {
+      cum = Math.min(Math.max(cum, 1), TOTAL_AYAT);
       for (let i = 0; i < SURAHS.length; i++) {
-        if (cumAyat <= CUMULATIVE[i + 1]) {
-          return { surah: SURAHS[i][0], name: SURAHS[i][1], ayah: cumAyat - CUMULATIVE[i] };
-        }
+        if (cum <= CUMULATIVE[i + 1]) return { surah: SURAHS[i][0], name: SURAHS[i][1], ayah: cum - CUMULATIVE[i] };
       }
       return { surah: 114, name: 'An-Nas', ayah: 6 };
     }
 
     function getCompletedSurahs(surahNum, ayah) {
-      let completed = surahNum - 1;
-      if (ayah >= SURAHS[surahNum - 1][2]) completed = surahNum;
+      let c = surahNum - 1;
+      if (ayah >= SURAHS[surahNum - 1][2]) c = surahNum;
+      return c;
+    }
+
+    function getCurrentJuz(cumAyat) {
+      if (cumAyat <= 0) return 0;
+      for (let i = 29; i >= 0; i--) {
+        const [s, a] = JUZ_STARTS[i];
+        if (cumAyat >= CUMULATIVE[s - 1] + a) return i + 1;
+      }
+      return 1;
+    }
+
+    function getCompletedJuz(cumAyat) {
+      let completed = 0;
+      for (let i = 1; i < 30; i++) {
+        const [s, a] = JUZ_STARTS[i];
+        if (cumAyat >= CUMULATIVE[s - 1] + a) completed = i;
+        else break;
+      }
+      if (cumAyat >= TOTAL_AYAT) completed = 30;
       return completed;
+    }
+
+    function getStreak(history) {
+      if (!history.length) return 0;
+      const dates = new Set();
+      history.forEach(e => dates.add(new Date(e.date).toISOString().split('T')[0]));
+      const today = new Date();
+      let check = new Date(today);
+      if (!dates.has(check.toISOString().split('T')[0])) check.setDate(check.getDate() - 1);
+      let streak = 0;
+      while (dates.has(check.toISOString().split('T')[0])) {
+        streak++;
+        check.setDate(check.getDate() - 1);
+      }
+      return streak;
     }
 
     function getIslamicDate(date) {
       try {
-        return new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', {
+        const str = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', {
           day: 'numeric', month: 'long', year: 'numeric'
         }).format(date);
+        return str.includes('AH') ? str : str + ' AH';
       } catch { return ''; }
     }
 
-    function getGregorianDate(date) {
-      return date.toLocaleDateString('en-US', {
-        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
-      });
+    function getGregorianDate(d) {
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     }
 
-    function formatShortDate(dateStr) {
-      return new Date(dateStr).toLocaleDateString('en-US', {
-        month: 'short', day: 'numeric', year: 'numeric'
-      });
+    function fmtShort(s) {
+      return new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
-    function formatDayDate(date) {
-      return date.toLocaleDateString('en-US', {
-        weekday: 'short', month: 'short', day: 'numeric'
-      });
+    function fmtDay(d) {
+      return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     }
 
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2800);
+      clearTimeout(t._tid);
+      t._tid = setTimeout(() => t.classList.remove('show'), 2800);
     }
 
-    // ─── Date Display ────────────────────────────────────────
+    // ─── Modal ────────────────────────────────────────────────
+    function showModal(message, confirmText, destructive) {
+      return new Promise(resolve => {
+        const overlay = document.getElementById('modal');
+        document.getElementById('modalMsg').textContent = message;
+        const cBtn = document.getElementById('modalConfirm');
+        cBtn.textContent = confirmText || 'Confirm';
+        cBtn.classList.toggle('danger', !!destructive);
+        overlay.classList.add('show');
+
+        function done(r) {
+          overlay.classList.remove('show');
+          cBtn.removeEventListener('click', yes);
+          document.getElementById('modalCancel').removeEventListener('click', no);
+          overlay.removeEventListener('click', bg);
+          resolve(r);
+        }
+        function yes() { done(true); }
+        function no() { done(false); }
+        function bg(e) { if (e.target === overlay) done(false); }
+
+        cBtn.addEventListener('click', yes);
+        document.getElementById('modalCancel').addEventListener('click', no);
+        overlay.addEventListener('click', bg);
+      });
+    }
+
+    // ─── Dates ────────────────────────────────────────────────
     function renderDates() {
       const now = new Date();
       document.getElementById('gregorianDate').textContent = getGregorianDate(now);
       const islamic = getIslamicDate(now);
-      const islamicEl = document.getElementById('islamicDate');
+      const el = document.getElementById('islamicDate');
       if (islamic) {
-        islamicEl.textContent = islamic + ' AH';
+        el.textContent = islamic;
       } else {
-        islamicEl.style.display = 'none';
-        islamicEl.previousElementSibling.style.display = 'none';
+        el.style.display = 'none';
+        el.previousElementSibling.style.display = 'none';
       }
     }
 
-    // ─── Animate Counter ─────────────────────────────────────
-    function animateCounter(el, target, duration, suffix) {
+    // ─── Animate ──────────────────────────────────────────────
+    let prevPercent = 0, prevAyat = 0;
+
+    function animateCounter(el, from, to, duration, suffix) {
       suffix = suffix || '';
-      const start = 0;
       const startTime = performance.now();
       function tick(now) {
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const val = Math.round(start + (target - start) * eased);
-        el.textContent = val.toLocaleString() + suffix;
-        if (progress < 1) requestAnimationFrame(tick);
+        const p = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = Math.round(from + (to - from) * eased);
+        el.textContent = (suffix === '%' ? val : val.toLocaleString()) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
       }
       requestAnimationFrame(tick);
     }
 
-    // ─── Animate Ring ────────────────────────────────────────
     function animateRing(percent) {
       const ring = document.getElementById('ringFill');
-      const circumference = 2 * Math.PI * 85;
-      ring.style.strokeDasharray = circumference;
-      ring.style.strokeDashoffset = circumference;
+      const c = 2 * Math.PI * 85;
+      ring.style.strokeDasharray = c;
       ring.style.transition = 'none';
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           ring.style.transition = 'stroke-dashoffset 1.8s cubic-bezier(0.16, 1, 0.3, 1)';
-          ring.style.strokeDashoffset = circumference * (1 - percent / 100);
+          ring.style.strokeDashoffset = c * (1 - percent / 100);
         });
       });
     }
 
-    // ─── Populate Dropdown ───────────────────────────────────
+    // ─── Dropdown ─────────────────────────────────────────────
     const surahSelect = document.getElementById('surahSelect');
     const ayahInput = document.getElementById('ayahInput');
+    const saveBtn = document.getElementById('saveBtn');
 
     SURAHS.forEach(([num, name, total]) => {
       const opt = document.createElement('option');
@@ -984,7 +1128,50 @@
     ayahInput.max = 7;
     ayahInput.placeholder = '1\u20137';
 
-    // ─── Render ──────────────────────────────────────────────
+    // Enter to submit
+    ayahInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); }
+    });
+
+    // ─── Surah Map ────────────────────────────────────────────
+    function renderSurahMap(cumAyat) {
+      const map = document.getElementById('surahMap');
+      let html = '';
+      let completedCount = 0;
+
+      for (let i = 0; i < SURAHS.length; i++) {
+        const [num, name, total] = SURAHS[i];
+        const end = CUMULATIVE[i + 1];
+        const start = CUMULATIVE[i];
+        let status = 'unread';
+        if (cumAyat >= end) { status = 'completed'; completedCount++; }
+        else if (cumAyat > start) { status = 'current'; }
+
+        const juz = getCurrentJuz(start + 1);
+        const label = `${num}. ${name} (${total} ayat) \u00b7 Juz ${juz}`;
+        html += `<div class="surah-tile ${status}" data-label="${label}"></div>`;
+      }
+
+      map.innerHTML = html;
+      document.getElementById('surahMapCount').textContent = `${completedCount} / 114`;
+    }
+
+    // Tooltip delegation
+    const tooltip = document.getElementById('tooltip');
+    document.getElementById('surahMap').addEventListener('mouseover', e => {
+      const tile = e.target.closest('.surah-tile');
+      if (!tile) return;
+      tooltip.textContent = tile.dataset.label;
+      tooltip.classList.add('show');
+      const r = tile.getBoundingClientRect();
+      tooltip.style.left = Math.max(10, Math.min(r.left + r.width / 2, window.innerWidth - 120)) + 'px';
+      tooltip.style.top = (r.top - 6) + 'px';
+    });
+    document.getElementById('surahMap').addEventListener('mouseleave', () => {
+      tooltip.classList.remove('show');
+    });
+
+    // ─── Render ───────────────────────────────────────────────
     function render(animate) {
       const data = loadData();
       const history = data.history || [];
@@ -992,26 +1179,31 @@
       const ayatReadEl = document.getElementById('ayatRead');
       const currentReading = document.getElementById('currentReading');
       const surahsDoneEl = document.getElementById('surahsDone');
+      const juzDoneEl = document.getElementById('juzDone');
       const avgPaceEl = document.getElementById('avgPace');
-      const daysLeftEl = document.getElementById('daysLeft');
-      const estCompEl = document.getElementById('estCompletion');
-      const estCompIslamicEl = document.getElementById('estCompletionIslamic');
+      const juzBadge = document.getElementById('juzBadge');
+      const streakBadge = document.getElementById('streakBadge');
+      const callout = document.getElementById('completionCallout');
       const historyList = document.getElementById('historyList');
-      const progressSection = document.getElementById('progressSection');
+      const section = document.getElementById('progressSection');
 
-      progressSection.classList.remove('completed');
+      section.classList.remove('completed');
 
       if (history.length === 0) {
         ringPercent.textContent = '0%';
         ayatReadEl.textContent = '0';
         currentReading.textContent = 'Begin your journey';
-        surahsDoneEl.textContent = '0 / 114';
+        surahsDoneEl.textContent = '0/114';
+        juzDoneEl.textContent = '0/30';
         avgPaceEl.innerHTML = '&mdash;';
-        daysLeftEl.innerHTML = '&mdash;';
-        estCompEl.innerHTML = '&mdash;';
-        estCompIslamicEl.textContent = '';
+        juzBadge.textContent = 'Juz 0 of 30';
+        streakBadge.textContent = 'No streak yet';
+        streakBadge.className = 'streak-badge';
+        callout.style.display = 'none';
         animateRing(0);
-        historyList.innerHTML = '<li class="empty-state">No entries yet &mdash; start reading and log your progress.</li>';
+        renderSurahMap(0);
+        historyList.innerHTML = '<li class="empty-state"><span class="empty-icon">&#9782;</span>No entries yet &mdash; start reading and log your progress.</li>';
+        prevPercent = 0; prevAyat = 0;
         renderPlan();
         return;
       }
@@ -1020,62 +1212,77 @@
       const ayatRead = getAyatRead(latest.surah, latest.ayah);
       const percent = Math.min((ayatRead / TOTAL_AYAT) * 100, 100);
       const completed = getCompletedSurahs(latest.surah, latest.ayah);
+      const juz = getCurrentJuz(ayatRead);
+      const juzCompleted = getCompletedJuz(ayatRead);
+      const streak = getStreak(history);
       const surahData = SURAHS[latest.surah - 1];
 
       if (animate) {
-        animateCounter(ringPercent, Math.round(percent * 10) / 10, 1200, '%');
-        animateCounter(ayatReadEl, ayatRead, 1000, '');
+        animateCounter(ringPercent, Math.round(prevPercent), Math.round(percent * 10) / 10, 1200, '%');
+        animateCounter(ayatReadEl, prevAyat, ayatRead, 1000, '');
       } else {
         ringPercent.textContent = (percent >= 100 ? 100 : percent.toFixed(1)) + '%';
         ayatReadEl.textContent = ayatRead.toLocaleString();
       }
 
+      prevPercent = percent;
+      prevAyat = ayatRead;
       animateRing(percent);
 
       if (percent >= 100) {
         currentReading.textContent = 'Alhamdulillah \u2014 Khatam Complete';
-        progressSection.classList.add('completed');
+        section.classList.add('completed');
       } else {
         currentReading.textContent = surahData[1] + ' : ' + latest.ayah;
       }
 
-      surahsDoneEl.textContent = completed + ' / 114';
+      surahsDoneEl.textContent = completed + '/114';
+      juzDoneEl.textContent = juzCompleted + '/30';
+      juzBadge.textContent = 'Juz ' + juz + ' of 30';
 
-      // Pace calculation
+      if (streak > 0) {
+        streakBadge.textContent = streak + (streak === 1 ? ' day streak' : ' day streak');
+        streakBadge.className = 'streak-badge active';
+      } else {
+        streakBadge.textContent = 'No streak yet';
+        streakBadge.className = 'streak-badge';
+      }
+
+      // Pace
       const firstDate = new Date(history[history.length - 1].date);
       const now = new Date();
       const daysDiff = Math.max((now - firstDate) / 86400000, 1);
       const pace = ayatRead / daysDiff;
-
       avgPaceEl.textContent = pace.toFixed(1);
 
+      // Completion
       if (ayatRead >= TOTAL_AYAT) {
-        daysLeftEl.textContent = '0';
-        estCompEl.textContent = 'Complete!';
-        estCompIslamicEl.textContent = '';
+        callout.style.display = 'flex';
+        document.getElementById('estCompDate').textContent = 'Complete!';
+        document.getElementById('estCompIslamic').textContent = 'Alhamdulillah';
+        document.getElementById('estCompDays').textContent = '';
       } else {
+        callout.style.display = 'flex';
         const remaining = TOTAL_AYAT - ayatRead;
         const dLeft = Math.ceil(remaining / pace);
-        daysLeftEl.textContent = '~' + dLeft;
-
-        const completionDate = new Date();
-        completionDate.setDate(completionDate.getDate() + dLeft);
-        estCompEl.textContent = completionDate.toLocaleDateString('en-US', {
-          month: 'short', day: 'numeric'
-        });
-        const islamicComp = getIslamicDate(completionDate);
-        estCompIslamicEl.textContent = islamicComp || '';
+        const compDate = new Date();
+        compDate.setDate(compDate.getDate() + dLeft);
+        document.getElementById('estCompDate').textContent = compDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        document.getElementById('estCompIslamic').textContent = getIslamicDate(compDate);
+        document.getElementById('estCompDays').textContent = '~' + dLeft + ' days';
       }
+
+      renderSurahMap(ayatRead);
 
       // History
       historyList.innerHTML = history.map(entry => {
         const s = SURAHS[entry.surah - 1];
-        const totalAtEntry = getAyatRead(entry.surah, entry.ayah);
-        const pct = ((totalAtEntry / TOTAL_AYAT) * 100).toFixed(1);
+        const tot = getAyatRead(entry.surah, entry.ayah);
+        const pct = ((tot / TOTAL_AYAT) * 100).toFixed(1);
         return `<li class="history-item">
           <div class="history-info">
             <span class="history-surah">${s[1]} : ${entry.ayah}</span>
-            <span class="history-date">${formatShortDate(entry.date)}</span>
+            <span class="history-date">${fmtShort(entry.date)}</span>
           </div>
           <span class="history-badge">${pct}%</span>
         </li>`;
@@ -1084,13 +1291,12 @@
       renderPlan();
     }
 
-    // ─── Plan ────────────────────────────────────────────────
+    // ─── Plan ─────────────────────────────────────────────────
     function renderPlan() {
       const data = loadData();
       const plan = data.plan;
       const planContent = document.getElementById('planContent');
       const btns = document.querySelectorAll('.plan-btn');
-
       btns.forEach(b => b.classList.remove('active'));
 
       if (!plan) {
@@ -1103,29 +1309,34 @@
 
       const history = data.history || [];
       let currentAyat = 0;
-      if (history.length > 0) {
-        const latest = history[0];
-        currentAyat = getAyatRead(latest.surah, latest.ayah);
-      }
+      if (history.length > 0) currentAyat = getAyatRead(history[0].surah, history[0].ayah);
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const planStart = new Date(plan.startDate + 'T00:00:00');
       const todayDayNum = Math.floor((today - planStart) / 86400000) + 1;
+      const expired = todayDayNum > plan.totalDays;
 
-      // Status
-      const expectedAyat = Math.min(plan.startAyat + plan.ayatPerDay * Math.max(todayDayNum, 1), TOTAL_AYAT);
+      // Don't expect progress until end of day 1
+      const expectedDays = Math.max(todayDayNum - 1, 0);
+      const expectedAyat = Math.min(plan.startAyat + plan.ayatPerDay * expectedDays, TOTAL_AYAT);
       const onTrack = currentAyat >= expectedAyat;
-      const statusClass = onTrack ? 'on-track' : 'behind';
-      const statusText = onTrack ? 'On track' : 'Behind';
+
+      let statusText, statusClass;
+      if (expired) { statusText = 'Expired'; statusClass = 'expired'; }
+      else if (onTrack) { statusText = 'On track'; statusClass = 'on-track'; }
+      else { statusText = 'Behind'; statusClass = 'behind'; }
+
+      const timeProgress = Math.min(Math.max(((todayDayNum - 1) / plan.totalDays) * 100, 0), 100);
 
       let html = `<div class="plan-summary">
         <div class="plan-summary-info">
           <span class="plan-summary-title">${plan.weeks} Week Plan</span>
-          <span class="plan-summary-detail">${plan.ayatPerDay} ayat per day</span>
+          <span class="plan-summary-detail">${plan.ayatPerDay} ayat/day \u00b7 Day ${Math.min(todayDayNum, plan.totalDays)} of ${plan.totalDays}</span>
         </div>
         <span class="plan-status ${statusClass}">${statusText}</span>
-      </div>`;
+      </div>
+      <div class="plan-progress-track"><div class="plan-progress-fill" style="width:${timeProgress}%"></div></div>`;
 
       html += '<ul class="plan-days" id="planDaysList">';
 
@@ -1134,46 +1345,57 @@
         dayDate.setDate(dayDate.getDate() + i - 1);
         const targetCum = Math.min(plan.startAyat + plan.ayatPerDay * i, TOTAL_AYAT);
         const pos = cumulativeToPosition(targetCum);
+        const dayDone = currentAyat >= targetCum;
 
-        let cls = '';
-        let tag = '';
-        if (i === todayDayNum) {
+        let cls = '', tag = '';
+        if (i === todayDayNum && !expired) {
           cls = 'today';
           tag = '<span class="tag">Today</span>';
         } else if (i < todayDayNum) {
           cls = 'past';
         }
 
+        const check = dayDone ? '<span class="day-check">\u2713</span>' : '';
+
         html += `<li class="plan-day ${cls}">
           <div class="plan-day-left">
             <span class="plan-day-num">Day ${i}${tag}</span>
-            <span class="plan-day-date">${formatDayDate(dayDate)}</span>
+            <span class="plan-day-date">${fmtDay(dayDate)}</span>
           </div>
-          <span class="plan-day-target">${pos.name} : ${pos.ayah}</span>
+          <div class="plan-day-right">
+            <span class="plan-day-target">${pos.name} : ${pos.ayah}</span>
+            ${check}
+          </div>
         </li>`;
       }
 
       html += '</ul>';
       planContent.innerHTML = html;
 
-      // Scroll to today
+      // Scroll container to today (not the page)
       requestAnimationFrame(() => {
         const todayEl = document.querySelector('.plan-day.today');
-        if (todayEl) {
-          const list = document.getElementById('planDaysList');
-          todayEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        const list = document.getElementById('planDaysList');
+        if (todayEl && list) {
+          list.scrollTop = todayEl.offsetTop - list.offsetTop - list.clientHeight / 2 + todayEl.clientHeight / 2;
         }
       });
     }
 
-    function setPlan(weeks) {
+    async function setPlan(weeks) {
       const data = loadData();
-      const history = data.history || [];
 
-      let currentAyat = 0;
-      if (history.length > 0) {
-        currentAyat = getAyatRead(history[0].surah, history[0].ayah);
+      if (data.plan && data.plan.weeks !== weeks) {
+        const ok = await showModal(
+          `Replace your ${data.plan.weeks}-week plan with a ${weeks}-week plan?`,
+          'Replace Plan', false
+        );
+        if (!ok) return;
       }
+
+      const history = data.history || [];
+      let currentAyat = 0;
+      if (history.length > 0) currentAyat = getAyatRead(history[0].surah, history[0].ayah);
 
       if (currentAyat >= TOTAL_AYAT) {
         showToast('You have already completed the Quran!');
@@ -1184,11 +1406,10 @@
       const totalDays = weeks * 7;
 
       data.plan = {
-        weeks: weeks,
+        weeks, totalDays,
         startDate: new Date().toISOString().split('T')[0],
         startAyat: currentAyat,
-        ayatPerDay: Math.ceil(remaining / totalDays),
-        totalDays: totalDays
+        ayatPerDay: Math.ceil(remaining / totalDays)
       };
 
       saveDataStore(data);
@@ -1196,12 +1417,12 @@
       showToast(`${weeks}-week plan created \u2014 ${data.plan.ayatPerDay} ayat/day`);
     }
 
-    // ─── Event Handlers ──────────────────────────────────────
+    // ─── Event Handlers ───────────────────────────────────────
     document.querySelectorAll('.plan-btn').forEach(btn => {
       btn.addEventListener('click', () => setPlan(parseInt(btn.dataset.weeks)));
     });
 
-    document.getElementById('saveBtn').addEventListener('click', () => {
+    saveBtn.addEventListener('click', () => {
       const surahNum = parseInt(surahSelect.value);
       const ayah = parseInt(ayahInput.value);
       const surah = SURAHS[surahNum - 1];
@@ -1213,49 +1434,67 @@
 
       const data = loadData();
 
+      // Duplicate check
       if (data.history.length > 0) {
         const latest = data.history[0];
+        if (latest.surah === surahNum && latest.ayah === ayah) {
+          showToast('Already at this position');
+          return;
+        }
         const currentTotal = getAyatRead(latest.surah, latest.ayah);
         const newTotal = getAyatRead(surahNum, ayah);
         if (newTotal < currentTotal) {
-          if (!confirm('This position is before your current progress. Continue?')) return;
+          showModal('This position is before your current progress. Continue?', 'Continue', false)
+            .then(ok => { if (ok) doSave(data, surahNum, ayah, surah); });
+          return;
         }
       }
 
-      data.history.unshift({
-        surah: surahNum,
-        ayah: ayah,
-        date: new Date().toISOString()
-      });
+      doSave(data, surahNum, ayah, surah);
+    });
 
+    function doSave(data, surahNum, ayah, surah) {
+      data.history.unshift({ surah: surahNum, ayah, date: new Date().toISOString() });
       saveDataStore(data);
-      render(false);
+      render(true);
+
+      // Success feedback
+      saveBtn.textContent = 'Saved \u2713';
+      saveBtn.classList.add('success');
+      setTimeout(() => { saveBtn.textContent = 'Save Progress'; saveBtn.classList.remove('success'); }, 1500);
+
       showToast(`Progress saved \u2014 ${surah[1]} : ${ayah}`);
-    });
 
-    document.getElementById('resetPlanBtn').addEventListener('click', () => {
+      // Auto-advance form
+      if (ayah >= surah[2] && surahNum < 114) {
+        surahSelect.value = surahNum + 1;
+        const next = SURAHS[surahNum];
+        ayahInput.max = next[2];
+        ayahInput.placeholder = `1\u2013${next[2]}`;
+      }
+      ayahInput.value = '';
+    }
+
+    document.getElementById('resetPlanBtn').addEventListener('click', async () => {
       const data = loadData();
-      if (!data.plan) {
-        showToast('No active plan to reset');
-        return;
-      }
-      if (confirm('Clear your reading plan?')) {
-        data.plan = null;
-        saveDataStore(data);
-        renderPlan();
-        showToast('Plan cleared');
-      }
+      if (!data.plan) { showToast('No active plan to reset'); return; }
+      const ok = await showModal('Clear your reading plan?', 'Clear Plan', false);
+      if (!ok) return;
+      data.plan = null;
+      saveDataStore(data);
+      renderPlan();
+      showToast('Plan cleared');
     });
 
-    document.getElementById('resetAllBtn').addEventListener('click', () => {
-      if (confirm('Reset all progress and plan? This cannot be undone.')) {
-        localStorage.removeItem('khatam');
-        render(false);
-        showToast('All progress has been reset');
-      }
+    document.getElementById('resetAllBtn').addEventListener('click', async () => {
+      const ok = await showModal('Reset all progress and plan? This cannot be undone.', 'Reset Everything', true);
+      if (!ok) return;
+      localStorage.removeItem('khatam');
+      render(false);
+      showToast('All progress has been reset');
     });
 
-    // ─── Init ────────────────────────────────────────────────
+    // ─── Init ─────────────────────────────────────────────────
     renderDates();
     render(true);
   </script>
