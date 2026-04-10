@@ -1470,8 +1470,10 @@
           tempSurah = idx + 1;
           const count = SURAHS[idx][2];
           ayahLabels = Array.from({ length: count }, (_, i) => `Ayah ${i + 1}`);
-          ayahWheel.updateItems(ayahLabels);
-          tempAyah = ayahWheel.getValue() + 1;
+          if (ayahWheel) {
+            ayahWheel.updateItems(ayahLabels);
+            tempAyah = ayahWheel.getValue() + 1;
+          }
         }
       );
 
