@@ -9,23 +9,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0C0C14;
-      --surface: #151520;
-      --surface-hover: #1C1C2A;
-      --surface-border: rgba(255,255,255,0.05);
-      --text: #EEEAE3;
-      --text-dim: #8A8696;
-      --text-faint: #4E4B5E;
-      --gold: #C9A84C;
-      --gold-glow: rgba(201,168,76,0.15);
-      --gold-bright: #E0C06A;
-      --teal: #3DA18D;
-      --teal-glow: rgba(61,161,141,0.12);
-      --danger: #C75050;
-      --danger-glow: rgba(199,80,80,0.12);
+      --bg: #F5F1EB;
+      --surface: #FFFFFF;
+      --surface-hover: #F9F7F4;
+      --surface-border: rgba(0,0,0,0.07);
+      --text: #1A1A2E;
+      --text-dim: #6B6878;
+      --text-faint: #A09DAD;
+      --gold: #B8943D;
+      --gold-glow: rgba(184,148,61,0.12);
+      --gold-bright: #D4AA4A;
+      --teal: #1B7A64;
+      --teal-glow: rgba(27,122,100,0.1);
+      --danger: #C44040;
+      --danger-glow: rgba(196,64,64,0.1);
       --radius: 14px;
       --radius-sm: 8px;
-      --shadow: 0 2px 16px rgba(0,0,0,0.4);
+      --shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
       --font-body: 'Manrope', sans-serif;
       --font-display: 'Cormorant Garamond', serif;
       --font-arabic: 'Amiri', serif;
@@ -40,8 +40,8 @@
       min-height: 100vh;
       line-height: 1.6;
       background-image:
-        radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.04) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(61,161,141,0.03) 0%, transparent 50%);
+        radial-gradient(ellipse at 50% 0%, rgba(184,148,61,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(27,122,100,0.04) 0%, transparent 50%);
     }
 
     /* Grain overlay */
@@ -51,7 +51,7 @@
       inset: 0;
       pointer-events: none;
       z-index: 100;
-      opacity: 0.5;
+      opacity: 0.35;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     }
 
@@ -208,7 +208,7 @@
 
     .ring-bg {
       fill: none;
-      stroke: var(--surface-hover);
+      stroke: #E8E4DD;
       stroke-width: 5;
     }
 
@@ -278,17 +278,17 @@
     }
 
     .stat-card {
-      background: rgba(255,255,255,0.02);
+      background: var(--surface-hover);
       border: 1px solid var(--surface-border);
       border-radius: 10px;
       padding: 1rem;
       text-align: center;
-      transition: border-color 0.3s, background 0.3s;
+      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
     }
 
     .stat-card:hover {
-      border-color: rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
+      border-color: rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
     .stat-value {
@@ -426,7 +426,7 @@
     }
 
     .plan-day:hover {
-      background: rgba(255,255,255,0.02);
+      background: rgba(0,0,0,0.02);
     }
 
     .plan-day.today {
@@ -508,7 +508,7 @@
       font-size: 0.85rem;
       font-family: var(--font-body);
       color: var(--text);
-      background: var(--bg);
+      background: var(--surface);
       outline: none;
       transition: border-color 0.25s, box-shadow 0.25s;
       width: 100%;
@@ -517,7 +517,8 @@
     }
 
     .form-group select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238A8696' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-color: var(--surface);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236B6878' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 0.75rem center;
       padding-right: 2rem;
@@ -547,12 +548,12 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--gold), var(--gold-bright));
-      color: #0C0C14;
+      background: linear-gradient(135deg, var(--teal), #22906F);
+      color: #FFFFFF;
     }
 
     .btn-primary:hover {
-      box-shadow: 0 4px 20px var(--gold-glow);
+      box-shadow: 0 4px 20px var(--teal-glow);
       transform: translateY(-1px);
     }
 
@@ -663,15 +664,15 @@
       bottom: 1.5rem;
       left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
+      background: var(--text);
+      border: none;
       border-left: 3px solid var(--gold);
-      color: var(--text);
+      color: #F5F1EB;
       padding: 0.75rem 1.25rem;
       border-radius: var(--radius-sm);
       font-size: 0.82rem;
       font-weight: 500;
-      box-shadow: var(--shadow);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
       opacity: 0;
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 1000;
